@@ -138,8 +138,16 @@ STATIC_URL = '/static/'
 # # user defined
 GRAPHENE = {
 	'SCHEMA':'ssplanner.schema.schema'
+	'MIDDLEWARE':[
+		'graphql_jwt.middleware.JSONWebTokenMiddleware',
+	]
 }
 
 AUTH_USER_MODEL = 'coresetup.Contact'
 
 CORS_ORIGIN_ALLOW_ALL = True
+
+AUTHENTICATION_BACKENDS = [
+    'graphql_jwt.backends.JSONWebTokenBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
