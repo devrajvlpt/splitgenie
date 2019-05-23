@@ -2,7 +2,7 @@ aniso8601==3.0.2
 astroid==1.6.5
 backports.functools-lru-cache==1.5
 configparser==3.5.0
-Django==1.11.16
+Django==1.11.20
 django-cors-headers==2.4.0
 django-filter==1.1.0
 django-graphql-jwt==0.2.1
