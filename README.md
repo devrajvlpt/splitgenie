@@ -1,2 +1,2 @@
-# splitgenie
-splitgenie
+# splitz
+splitz
