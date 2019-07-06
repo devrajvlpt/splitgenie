@@ -3,8 +3,8 @@
 
 	git clone the repository and change directory to the project
 
-	```install python and pip 
-		then using  pip install pipenv```
+	Install python and pip then using  pip 
+	Install pipenv
 
 	# Activate Virtualenv using below
 
