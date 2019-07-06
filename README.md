@@ -1,5 +1,5 @@
-# splitgenie
-	splitgenie
+# splitz
+	splitz
 
 	git clone the repository and change directory to the project
 
@@ -17,6 +17,7 @@
 	# Start server using under ssplanner folder
 
 	``` python manage.py runserver```
+
 
 
 
