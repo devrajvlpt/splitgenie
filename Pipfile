@@ -1,14 +1,12 @@
 [[source]]
+name = "pypi"
 url = "https://pypi.org/simple"
 verify_ssl = true
-name = "pypi"
 
 [dev-packages]
 
 [packages]
-django = "*"
-djangorestframework = "*"
-mysql-connector-python = "*"
+django-graphene-permissions = "*"
 
 [requires]
-python_version = "2.7"
+python_version = "3.6"

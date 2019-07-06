@@ -48,7 +48,7 @@ MIDDLEWARE = [
 	'django.middleware.security.SecurityMiddleware',
 	'django.contrib.sessions.middleware.SessionMiddleware',
 	'django.middleware.common.CommonMiddleware',
-	'django.middleware.csrf.CsrfViewMiddleware',
+	# 'django.middleware.csrf.CsrfViewMiddleware',
 	'django.contrib.auth.middleware.AuthenticationMiddleware',
 	'django.contrib.messages.middleware.MessageMiddleware',
 	'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -83,13 +83,12 @@ WSGI_APPLICATION = 'ssplanner.wsgi.application'
 
 DATABASES = {
 	'default': {        
-		'ENGINE':'mysql.connector.django',
-		'NAME':'ssdb',
-		'USER':'kmesh',
-		'PASSWORD':'kmesh',
-		'OPTIONS':{
-			'autocommit':True,
-		}
+		'ENGINE':'django.db.backends.postgresql_psycopg2',
+		'NAME':'genie_main',
+		'USER':'genie',
+		'PASSWORD':'genie',
+		'HOST':'localhost',
+		'PORT':'5432',
 		
 
 	},
@@ -137,7 +136,7 @@ STATIC_URL = '/static/'
 
 # # user defined
 GRAPHENE = {
-	'SCHEMA':'ssplanner.schema.schema'
+	'SCHEMA':'ssplanner.schema.schema',
 	'MIDDLEWARE':[
 		'graphql_jwt.middleware.JSONWebTokenMiddleware',
 	]
