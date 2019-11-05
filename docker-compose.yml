@@ -1,0 +1,20 @@
+version: '2.1'
+
+services:
+  splitgenie:
+    image: splitgenie
+    build: .
+    ports:
+      - 9000:9000
+  #   depends_on:
+  #       - db
+  # db:
+  #   image: postgresql
+  #   build:
+  #     context: ../postgres_db
+  #     dockerfile: Dockerfile
+  #   restart: always
+  #   environment:
+  #     POSTGRES_USER: splitz
+  #     POSTGRES_PASSWORD: splitz
+  #     POSTGRES_DB: pocdb
