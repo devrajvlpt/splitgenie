@@ -115,9 +115,11 @@ class Topic(models.Model):
         updated_at (TYPE): Description
         updated_by (TYPE): Description
     """
-
-    total_amount = models.IntegerField()
-    split_number = models.IntegerField()
+    topic_name = models.CharField(
+        max_length=240,
+        default="splitztopic"
+    )
+    total_amount = models.IntegerField()    
     created_by = models.ForeignKey(
                             settings.AUTH_USER_MODEL,
                             related_name='topic_created',
@@ -135,7 +137,6 @@ class Topic(models.Model):
 class SplitAmountLedger(models.Model):
 
     """List of splitted amount to each user under same topic
-    
     Attributes:
         created_at (TYPE): Description
         created_by (TYPE): Description
@@ -143,22 +144,26 @@ class SplitAmountLedger(models.Model):
         splitted_user (TYPE): Description
         updated_at (TYPE): Description
         updated_by (TYPE): Description
-    """
-
-    splitted_user  = models.ForeignKey(
-                                settings.AUTH_USER_MODEL, 
-                                related_name= 'sa_ledger_user', 
+    """    
+    splitted_user = models.ForeignKey(
+                                settings.AUTH_USER_MODEL,
+                                related_name='sa_ledger_user',
                                 on_delete=models.CASCADE
                             )
     splitted_amount = models.IntegerField()
+    topic_id = models.ForeignKey(
+            Contact,
+            related_name='sa_ledger_topic',
+            on_delete=models.CASCADE
+    )
     created_by = models.ForeignKey(
-                            settings.AUTH_USER_MODEL, 
-                            related_name= 'sa_ledger_created', 
+                            settings.AUTH_USER_MODEL,
+                            related_name='sa_ledger_created', 
                             on_delete=models.CASCADE
                         )
     updated_by = models.ForeignKey(
                             settings.AUTH_USER_MODEL, 
-                            related_name= 'sa_ledger_updated',
+                            related_name='sa_ledger_updated',
                             on_delete=models.CASCADE
                         )
     created_at = models.DateTimeField(auto_now_add=True)    

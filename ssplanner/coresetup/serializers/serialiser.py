@@ -39,14 +39,15 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = Contact
         fields = [
-            'mobile_number', 'last_login',
+            'id', 'mobile_number', 'last_login',
             'email', 'first_name',
             'last_name', 'registered_time',
             ]
-    
+
 
 class TopicSerializer(serializers.ModelSerializer):
-
+    created_by = UserSerializer(read_only=False)
+    updated_by = UserSerializer(read_only=False)
     """Summary
     """
     class Meta:
@@ -59,12 +60,24 @@ class TopicSerializer(serializers.ModelSerializer):
         model = Topic
         fields = '__all__'
 
+    def create(self, validated_data):
+        topic = Topic(
+            topic_name=validated_data['topic_name'],
+            total_amount=validated_data['total_amount'],
+            created_by=validated_data['created_by'],
+            updated_by=validated_data['updated_by']
+        )      
+        topic.save()
+        return topic
+
 
 class SplitLedgerSerializer(serializers.ModelSerializer):
 
     """Summary
     """
-    topic =  TopicSerializer()
+    # splitted_user = UserSerializer(read_only=True)
+    # created_by = UserSerializer(read_only=True)
+    # updated_by = UserSerializer(read_only=True)
 
     class Meta:
 
@@ -78,10 +91,3 @@ class SplitLedgerSerializer(serializers.ModelSerializer):
     	model = SplitAmountLedger
     	fields = '__all__'
 
-    def create(self, validated_data):
-        """Summary
-        
-        Args:
-            validated_data (TYPE): Description
-        """
-        topic_data = validated_data.pop('topic')
