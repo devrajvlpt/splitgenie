@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# https://github.com/RealmTeam/django-rest-framework-social-oauth2
 from __future__ import unicode_literals
 
 from coresetup.models.models import Contact

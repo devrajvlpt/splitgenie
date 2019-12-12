@@ -103,6 +103,25 @@ class Contact(AbstractBaseUser):
     USERNAME_FIELD = 'mobile_number'
 
 
+class Friend(models.Model):
+    users = models.ManyToManyField(Contact)
+    current_user = models.ForeignKey(Contact, related_name='owner', null=True)
+
+    @classmethod
+    def make_friend(cls, current_user, new_friend):
+        friend, created = cls.objects.get_or_create(
+            current_user=current_user
+        )
+        friend.users.add(new_friend)
+
+    @classmethod
+    def remove_friend(cls, current_user, new_friend):
+        friend, created = cls.objects.get_or_create(
+            current_user=current_user
+        )
+        friend.users.remove(new_friend)
+
+
 class Topic(models.Model):
 
     """Topic based on share is created

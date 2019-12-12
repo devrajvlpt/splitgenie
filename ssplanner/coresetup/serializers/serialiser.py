@@ -9,7 +9,8 @@ from datetime import datetime
 from coresetup.models.models import (
     Contact,
     Topic,
-    SplitAmountLedger
+    SplitAmountLedger,
+    Friend
 )
 
 
@@ -34,6 +35,9 @@ class ContactSerializer(serializers.ModelSerializer):
         return contact
 
 
+
+
+
 class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -43,6 +47,14 @@ class UserSerializer(serializers.ModelSerializer):
             'email', 'first_name',
             'last_name', 'registered_time',
             ]
+
+
+class FriendsSerializer(serializers.ModelSerializer):
+    users = UserSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = Friend
+        fields = ['current_user', 'users']
 
 
 class TopicSerializer(serializers.ModelSerializer):
