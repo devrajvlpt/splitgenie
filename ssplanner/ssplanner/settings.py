@@ -36,13 +36,15 @@ INSTALLED_APPS = [
 	'django.contrib.auth',
 	'django.contrib.contenttypes',
 	'django.contrib.sessions',
-	'django.contrib.messages',  
-	'django.contrib.staticfiles',
+	'django.contrib.messages',
+	'django.contrib.staticfiles',	
 
 	'rest_framework',
-	'rest_framework.authtoken',	
-
-
+	'rest_framework.authtoken',
+	'oauth2_provider',
+    'social_django',
+    'rest_framework_social_oauth2',
+	
 	'coresetup',
 	'corsheaders',
 ]
@@ -71,6 +73,8 @@ TEMPLATES = [
 				'django.template.context_processors.request',
 				'django.contrib.auth.context_processors.auth',
 				'django.contrib.messages.context_processors.messages',
+				'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
 			],
 		},
 	},
@@ -146,6 +150,9 @@ AUTH_USER_MODEL = 'coresetup.Contact'
 CORS_ORIGIN_ALLOW_ALL = True
 
 AUTHENTICATION_BACKENDS = [
+	# Google OAuth2
+    'social_core.backends.google.GoogleOAuth2',
+	'rest_framework_social_oauth2.backends.DjangoOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 ]
 
@@ -155,6 +162,8 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.BasicAuthentication',
+		'oauth2_provider.contrib.rest_framework.OAuth2Authentication',  # django-oauth-toolkit >= 1.0.0
+        'rest_framework_social_oauth2.authentication.SocialAuthentication',
 		],
 	
 	'DEFAULT_PERMISSION_CLASSES': [
@@ -162,6 +171,18 @@ REST_FRAMEWORK = {
 		],
 }
 
+#clientid = '999282140634-j9lcf979ct4pkk9b1a09ooseie5ae8k5.apps.googleusercontent.com'
+#clientsecret ='bi9Py4F3tfcxmtL2xUQ_POTw'
+
+# Google configuration
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '999282140634-j9lcf979ct4pkk9b1a09ooseie5ae8k5.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'bi9Py4F3tfcxmtL2xUQ_POTw'
+
+# Define SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE to get extra permissions from Google.
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
+    'https://www.googleapis.com/auth/userinfo.email',
+    'https://www.googleapis.com/auth/userinfo.profile',
+]
 # JWT settings
 JWT_AUTH = {
     'JWT_ENCODE_HANDLER':
@@ -197,3 +218,6 @@ JWT_AUTH = {
     'JWT_AUTH_HEADER_PREFIX': 'Bearer',
     'JWT_AUTH_COOKIE': None,
 }
+
+
+LOGIN_REDIRECT_URL = '/'

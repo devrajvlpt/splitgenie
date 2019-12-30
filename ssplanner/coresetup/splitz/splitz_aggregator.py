@@ -2,48 +2,33 @@
 from __future__ import unicode_literals
 from coresetup.models.models import (
     SplitAmountLedger,
-    Topic
+    Topic,
+    Contact
 )
-import copy
+from coresetup.serializers.serialiser import (
+    SplitLedgerSerializer
+)
 
 
 class SplitzAggregator(object):
 
-    def get_splitted_amount(self, validated_data):
-        
-        user_list = []
-        len_of_splitz = SplitAmountLedger.objects.filter(
-            topic_id=validated_data['topic_id']
-        ).count()
-
-        total_amount = Topic.objects.filter(
-                id=validated_data['topic_id']
-                ).values('total_amount')
-
-        if len_of_splitz == 0:
-            # initial insert both
-            user_list.append(validated_data)
-            initial_data = copy.deepcopy(validated_data)
-            initial_data['splitted_user'] = validated_data['created_by']
-            user_list.append(initial_data)
-
-            validated_data['splitted_amount'] = int(
-                total_amount[0].get(
-                    'total_amount', 0
-                    )/user_list
-                )
-            return user_list
-        else:
-            # one insert others update
-            validated_data['splitted_amount'] = total_amount[0].get(
-                'total_amount', 0) / (len_of_splitz + 1)
-            user_list.append(validated_data)
-
-            update_amount = SplitAmountLedger.objects.filter(
-                topic_id=validated_data['topic_id']
+    def set_splitted_amount(self, validated_data):
+        splitz_amount = {}
+        split_amount = (
+                validated_data['total_amount'] /
+                len(validated_data['users'])
             )
-            for update in update_amount:
-                update['splitted_amount'] = total_amount[0].get(
-                            'total_amount', 0) / (len_of_splitz + 1)
-                user_list.append(update)
-            return user_list
+        counter = 0
+        for user in validated_data['users']:
+            splitz_amount['splitted_user'] = user
+            splitz_amount['splitted_amount'] = split_amount
+            splitz_amount['topic_id'] = validated_data['topic_id']
+            splitz_amount['created_by'] = validated_data['created_by']
+            splitz_amount['updated_by'] = validated_data['updated_by']
+            splitz = SplitLedgerSerializer(data=splitz_amount)
+            if splitz.is_valid():
+                splitz.save()
+            counter += 1
+            if counter == len(validated_data['users']):
+                break
+        return True

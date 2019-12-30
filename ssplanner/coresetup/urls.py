@@ -1,23 +1,30 @@
 # # URLconf
 from django.conf.urls import url
-from views.login import LoginView, LogoutView
-from views.register import (
+from coresetup.views.login import LoginView, LogoutView
+from coresetup.views.register import (
    RegisterView,
    RegisterDetailView,
 )
-from views.topic import (
+from coresetup.views.topic import (
    TopicView
 )
-from views.splitz import (
-   SplitzView
+from coresetup.views.splitz import (
+   SplitzView,
+   SplitzDetailView
 )
-from views.friends import (
+from coresetup.views.friends import (
    FriendView
 )
-
+from coresetup.views.login import (
+   ApplicationListView,
+   SocialAuthAssociationView
+)
+from coresetup.views.payments import (
+   OrderInterfaceView
+)
 # from django.urls import path
 from rest_framework.urlpatterns import format_suffix_patterns
-
+from django.urls import path
 
 urlpatterns = [
    # URL from Login View
@@ -26,8 +33,12 @@ urlpatterns = [
    url('users',      RegisterView.as_view(), name='users'),
    url('userlist',   RegisterDetailView.as_view(), name='userlist'),
    url('topic',      TopicView.as_view(), name='topic'),
-   url('splitz',     SplitzView.as_view(), name='splitz'),
+   path('splitz',     SplitzView.as_view(), name='splitz'),
+   path('splitz/<int:pk>',     SplitzDetailView.as_view(), name='splitzdetail'),
    url('listfriend', FriendView.as_view(), name='listfriend'),
+   url('createorder', OrderInterfaceView.as_view(), name='listfriend'),
+   url(r'^applications', ApplicationListView.as_view()),
+   url(r'^socialauth', SocialAuthAssociationView.as_view()),
 ]
 
 # urlpatterns = format_suffix_patterns(urlpatterns)

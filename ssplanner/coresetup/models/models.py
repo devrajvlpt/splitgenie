@@ -37,7 +37,7 @@ class ContactManager(BaseUserManager):
         """
         if not mobile_number:
             raise ValueError('Users must have an mobile_number address')
-        print "I'm here for the break"
+        print ("I'm here for the break")
         user = self.model(
             mobile_number=self.normalize_mobile_number(mobile_number),
             last_login=self.auto_now()
@@ -99,13 +99,29 @@ class Contact(AbstractBaseUser):
     email = models.EmailField(max_length=254, unique=True, default='')
     first_name = models.CharField(max_length=120, default='')
     last_name = models.CharField(max_length=120, default='')
+    is_staff = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)    
     registered_time = models.DateTimeField(default=datetime.now())
     USERNAME_FIELD = 'mobile_number'
+
+    def has_perm(self, perm, obj=None):
+        if self.is_active:
+            return True
+
+    def has_module_perms(self, app_label):
+        if self.is_active:
+            return True
 
 
 class Friend(models.Model):
     users = models.ManyToManyField(Contact)
-    current_user = models.ForeignKey(Contact, related_name='owner', null=True)
+    current_user = models.ForeignKey(
+        Contact,
+        related_name='owner',
+        on_delete=models.CASCADE,
+        null=True
+    )
 
     @classmethod
     def make_friend(cls, current_user, new_friend):
@@ -171,7 +187,7 @@ class SplitAmountLedger(models.Model):
                             )
     splitted_amount = models.IntegerField()
     topic_id = models.ForeignKey(
-            Contact,
+            Topic,
             related_name='sa_ledger_topic',
             on_delete=models.CASCADE
     )

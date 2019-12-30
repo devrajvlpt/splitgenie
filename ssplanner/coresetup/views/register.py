@@ -34,8 +34,8 @@ class RegisterView(APIView):
 
 
 class RegisterDetailView(APIView):
-    permission_classes = (IsAuthenticated,)
-
+    permission_classes = (AllowAny,)
+    
     def get(self, request):
         contacts = Contact.objects.all()
         userserializer = UserSerializer(contacts, many=True)

@@ -12,20 +12,28 @@ from rest_framework.permissions import (
 from coresetup.serializers.serialiser import (
     TopicSerializer
 )
+from coresetup.splitz.splitz_aggregator import (
+    SplitzAggregator
+)
 
 
 class TopicView(APIView):
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (AllowAny, )
+    splitz_aggregator = SplitzAggregator()
 
-    def post(self, request):
-
+    def post(self, request):        
         topic = TopicSerializer(data=request.data)
         if topic.is_valid():
             topic.save()
-            return Response(
-                topic.data,
-                status=status.HTTP_201_CREATED
+            request.data['topic_id'] = topic.data['id']
+            aggregated_data = TopicView.splitz_aggregator.set_splitted_amount(
+                request.data
             )
+            if aggregated_data:
+                return Response(
+                    topic.data,
+                    status=status.HTTP_201_CREATED
+                )
         return Response(
             topic.errors,
             status=status.HTTP_400_BAD_REQUEST

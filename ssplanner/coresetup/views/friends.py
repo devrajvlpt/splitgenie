@@ -5,11 +5,11 @@ from __future__ import unicode_literals
 
 from coresetup.models.models import Friend
 from rest_framework.views import APIView
-from rest_framework.generics import RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import (    
-    IsAuthenticated
+    IsAuthenticated,
+    AllowAny
 )
 from coresetup.serializers.serialiser import (
     FriendsSerializer
@@ -17,7 +17,7 @@ from coresetup.serializers.serialiser import (
 
 
 class FriendView(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
 
     def get(self, request):
         friends = Friend.objects.filter(pk=request.data['id'])

@@ -12,6 +12,8 @@ from coresetup.models.models import (
     SplitAmountLedger,
     Friend
 )
+from oauth2_provider.models import Application
+from social_django.models import UserSocialAuth
 
 
 class ContactSerializer(serializers.ModelSerializer):
@@ -35,9 +37,6 @@ class ContactSerializer(serializers.ModelSerializer):
         return contact
 
 
-
-
-
 class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -58,13 +57,13 @@ class FriendsSerializer(serializers.ModelSerializer):
 
 
 class TopicSerializer(serializers.ModelSerializer):
-    created_by = UserSerializer(read_only=False)
-    updated_by = UserSerializer(read_only=False)
+    # created_by = UserSerializer()
+    # updated_by = UserSerializer()
     """Summary
     """
     class Meta:
 
-    	"""Summary
+        """Summary
         Attributes:
             fields (str): Description
             model (TYPE): Description
@@ -87,7 +86,8 @@ class SplitLedgerSerializer(serializers.ModelSerializer):
 
     """Summary
     """
-    # splitted_user = UserSerializer(read_only=True)
+    topic_id = TopicSerializer(read_only=True)
+    splitted_user = UserSerializer(read_only=True)
     # created_by = UserSerializer(read_only=True)
     # updated_by = UserSerializer(read_only=True)
 
@@ -103,3 +103,16 @@ class SplitLedgerSerializer(serializers.ModelSerializer):
     	model = SplitAmountLedger
     	fields = '__all__'
 
+
+class ApplicationListSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Application
+        fields = '__all__'
+
+
+class SocialAuthSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = UserSocialAuth
+        fields = '__all__'
