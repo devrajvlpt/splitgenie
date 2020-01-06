@@ -2,12 +2,12 @@
 # https://tailwindcss.com/
 # python manage.py make migrations your_app_label
 # python manage.py migrate --fake-initial your_app_label
-
 from __future__ import unicode_literals
+import jwt
 
 from django.db import models
 from django.contrib.auth.models import User
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.conf import settings
 from django.utils.timezone import now
 # accounts.models.py
@@ -105,6 +105,19 @@ class Contact(AbstractBaseUser):
     registered_time = models.DateTimeField(default=datetime.now())
     USERNAME_FIELD = 'mobile_number'
 
+    def __str__(self):
+        """
+        Returns a string representation of this `User`.
+
+        This string is used when a `User` is printed in the console.
+        """
+        user = {
+            'mobile_number':self.mobile_number,
+            'first_name':self.first_name,
+            'token':self.token
+        }
+        return str(user)
+
     def has_perm(self, perm, obj=None):
         if self.is_active:
             return True
@@ -112,6 +125,24 @@ class Contact(AbstractBaseUser):
     def has_module_perms(self, app_label):
         if self.is_active:
             return True
+    
+    @property
+    def token(self):
+        return self._generate_jwt_token()
+    
+    def _generate_jwt_token(self):
+        """
+        Generates a JSON Web Token that stores this user's ID and has an expiry
+        date set to 60 days into the future.
+        """
+        dt = datetime.now() + timedelta(days=60)
+
+        token = jwt.encode({
+            'id': self.pk,
+            'exp': int(dt.strftime('%s'))
+        }, settings.SECRET_KEY, algorithm='HS256')
+
+        return token.decode('utf-8')
 
 
 class Friend(models.Model):
@@ -138,6 +169,21 @@ class Friend(models.Model):
         friend.users.remove(new_friend)
 
 
+# Model for Topic members
+class TopicMembers(models.Model):
+    user = models.ForeignKey(
+                settings.AUTH_USER_MODEL,
+                related_name='member_list',
+                on_delete=models.CASCADE
+            )
+    current_user = models.ForeignKey(
+        Contact,
+        related_name='TopicOwner',
+        on_delete=models.CASCADE,
+        null=True
+    )
+  
+
 class Topic(models.Model):
 
     """Topic based on share is created
@@ -154,7 +200,8 @@ class Topic(models.Model):
         max_length=240,
         default="splitztopic"
     )
-    total_amount = models.IntegerField()    
+    total_amount = models.IntegerField()
+    members_list = models.ManyToManyField(TopicMembers, blank=True)
     created_by = models.ForeignKey(
                             settings.AUTH_USER_MODEL,
                             related_name='topic_created',
@@ -168,6 +215,18 @@ class Topic(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)    
     updated_at = models.DateTimeField(auto_now=True)
 
+
+# class TopicMembersList(models.Model):
+#     member = models.ForeignKey(
+#                 TopicMembers,
+#                 related_name='member_topic_list',
+#                 on_delete=models.CASCADE
+#             )
+#     topic = models.ForeignKey(
+#                 Topic,
+#                 related_name='topic_member_list',
+#                 on_delete=models.CASCADE
+#             )
 
 class SplitAmountLedger(models.Model):
 

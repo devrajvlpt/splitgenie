@@ -9,17 +9,24 @@ from oauth2_provider.models import Application
 from rest_framework.permissions import AllowAny
 from coresetup.serializers.serialiser import (
     ApplicationListSerializer,
-    SocialAuthSerializer
+    SocialAuthSerializer,
+    LoginSerializer
 )
+from coresetup.apps.renderers import UserJSONRenderer
 
 
-class LoginView(View):
+class LoginView(APIView):
+    permission_classes = (AllowAny,)
+    renderer_classes = (UserJSONRenderer, )
+    serializer_class = LoginSerializer
 
     def post(self, request):
-        pass
-
-    def get(self, request):
-        pass
+        user = request.data
+        print(user)
+        login = self.serializer_class(data=user)
+        login.is_valid(raise_exception=True)
+        print(login.data)
+        return Response(login.data, status=status.HTTP_200_OK)
 
 
 class LogoutView(View):

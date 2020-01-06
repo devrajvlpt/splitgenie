@@ -11,7 +11,8 @@ from rest_framework.permissions import (
     AllowAny
 )
 from coresetup.serializers.serialiser import (
-    SplitLedgerSerializer
+    SplitLedgerSerializer,
+    SplitLedgerDetailSerializer
 )
 from coresetup.splitz.splitz_aggregator import (
     SplitzAggregator
@@ -58,13 +59,12 @@ class SplitzView(APIView):
 
 class SplitzDetailView(APIView):
     permission_classes = (AllowAny,)
-    
-    def get(self, request, pk, format=None):
-        print(pk)
+
+    def get(self, request, pk, format=None):        
         splitz_details = SplitAmountLedger.objects.filter(
-            topic_id=pk
-            )
-        splitzserializer = SplitLedgerSerializer(splitz_details, many=True)
+            topic_id=pk,
+            ).exclude(splitted_user=request.user.id)
+        splitzserializer = SplitLedgerDetailSerializer(splitz_details, many=True)
         return Response(
             splitzserializer.data,
             status=status.HTTP_200_OK

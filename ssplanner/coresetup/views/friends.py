@@ -17,9 +17,9 @@ from coresetup.serializers.serialiser import (
 
 
 class FriendView(APIView):
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request):
-        friends = Friend.objects.filter(pk=request.data['id'])
+        friends = Friend.objects.filter(pk=request.user.id)
         friendsserializer = FriendsSerializer(friends, many=True)
         return Response(friendsserializer.data, status.HTTP_200_OK)

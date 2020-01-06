@@ -21,14 +21,14 @@ class OrderInterfaceView(APIView):
     permission_classes = (AllowAny, )
 
     def post(self, request):
-        DATA = { 
-            'amount': 50000,
-            'currency': 'INR',
-            'receipt': 'order_rcptid_11',
-            'notes': {'Shipping address': 'Bommanahalli, Bangalore'},
-            'payment_capture': 1
-        }
-        response = CLIENT.order.create(data=DATA)
+        # DATA = { 
+        #     'amount': 50000,
+        #     'currency': 'INR',
+        #     'receipt': 'order_rcptid_11',
+        #     'notes': {'Shipping address': 'Bommanahalli, Bangalore'},
+        #     'payment_capture': 1
+        # }
+        response = CLIENT.order.create(data=request.data)
         return Response(response, status.HTTP_201_CREATED)
 
     def get(self, request):
