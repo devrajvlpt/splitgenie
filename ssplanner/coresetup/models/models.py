@@ -160,6 +160,7 @@ class Friend(models.Model):
             current_user=current_user
         )
         friend.users.add(new_friend)
+        return True
 
     @classmethod
     def remove_friend(cls, current_user, new_friend):
@@ -167,22 +168,8 @@ class Friend(models.Model):
             current_user=current_user
         )
         friend.users.remove(new_friend)
+        return True
 
-
-# Model for Topic members
-class TopicMembers(models.Model):
-    user = models.ForeignKey(
-                settings.AUTH_USER_MODEL,
-                related_name='member_list',
-                on_delete=models.CASCADE
-            )
-    current_user = models.ForeignKey(
-        Contact,
-        related_name='TopicOwner',
-        on_delete=models.CASCADE,
-        null=True
-    )
-  
 
 class Topic(models.Model):
 
@@ -200,8 +187,7 @@ class Topic(models.Model):
         max_length=240,
         default="splitztopic"
     )
-    total_amount = models.IntegerField()
-    members_list = models.ManyToManyField(TopicMembers, blank=True)
+    total_amount = models.IntegerField()    
     created_by = models.ForeignKey(
                             settings.AUTH_USER_MODEL,
                             related_name='topic_created',
@@ -215,18 +201,6 @@ class Topic(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)    
     updated_at = models.DateTimeField(auto_now=True)
 
-
-# class TopicMembersList(models.Model):
-#     member = models.ForeignKey(
-#                 TopicMembers,
-#                 related_name='member_topic_list',
-#                 on_delete=models.CASCADE
-#             )
-#     topic = models.ForeignKey(
-#                 Topic,
-#                 related_name='topic_member_list',
-#                 on_delete=models.CASCADE
-#             )
 
 class SplitAmountLedger(models.Model):
 

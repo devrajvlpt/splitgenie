@@ -1,9 +1,8 @@
-from .models import Contact, Topic, SplitAmountLedger, TopicMembers
+from .models import Contact, Topic, SplitAmountLedger
 
 
 __all_ = [
     Contact,
     Topic,
     SplitAmountLedger,
-    TopicMembers
 ]

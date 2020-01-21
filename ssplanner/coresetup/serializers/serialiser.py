@@ -8,8 +8,7 @@ from django.contrib.auth import authenticate
 # Create your views here.
 from coresetup.models.models import (
     Contact,
-    Topic,
-    TopicMembers,
+    Topic,    
     SplitAmountLedger,
     Friend
 )
@@ -60,17 +59,9 @@ class FriendsSerializer(serializers.ModelSerializer):
         fields = ['id', 'current_user', 'users']
 
 
-class TopicMemberSerializer(serializers.ModelSerializer):    
-    # current_user = UserSerializer(many=True)
-    # user = UserSerializer(many=True)
-
-    class Meta:
-        model = TopicMembers
-        fields = ['id', 'current_user', 'user']
-
-
-class TopicSerializer(serializers.ModelSerializer):    
-    members_list = TopicMemberSerializer(read_only=True, many=True)
+class TopicSerializer(serializers.ModelSerializer):
+    # created_by = UserSerializer()
+    # updated_by = UserSerializer()
     """Summary
     """
     class Meta:
@@ -81,29 +72,20 @@ class TopicSerializer(serializers.ModelSerializer):
             model (TYPE): Description
         """
         model = Topic
-        fields = [
-            'id', 'topic_name', 
-            'total_amount', 'members_list', 
-            'created_by', 'updated_by',
-            'created_at', 'updated_at'
-            ]
-        depth = 1
+        fields = '__all__'
 
-    # # def create(self, validated_data):
-    # #     print(validated_data)
-    # #     topic = Topic.objects.create(
-    # #         **validated_data
-    # #     )      
-    # #     members_list = validated_data.pop('members_list')
-    # #     print (members_list)
-    # #     for member in members_list:
-    # #         topic.members_list.add(member)
-
-    #     return topic
+    def create(self, validated_data):
+        topic = Topic(
+            topic_name=validated_data['topic_name'],
+            total_amount=validated_data['total_amount'],
+            created_by=validated_data['created_by'],
+            updated_by=validated_data['updated_by']
+        )      
+        topic.save()
+        return topic
 
 
-class TopicDetailSerializer(serializers.ModelSerializer):    
-    members_list = TopicMemberSerializer(read_only=True, many=True)
+class TopicDetailSerializer(serializers.ModelSerializer):
     """Summary
     """
     class Meta:

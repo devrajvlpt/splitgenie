@@ -10,6 +10,10 @@ from rest_framework.permissions import (
     IsAuthenticated,
     AllowAny
 )
+from coresetup.models import (
+    Topic,
+    Contact
+)
 from coresetup.serializers.serialiser import (
     SplitLedgerSerializer,
     SplitLedgerDetailSerializer
@@ -24,28 +28,30 @@ class SplitzView(APIView):
     splitz_aggregator = SplitzAggregator()
 
     def post(self, request):
-
-        aggregated_data = SplitzView.splitz_aggregator.get_splitted_amount(
-            request.data
-        )
-        len_of_splitz = SplitAmountLedger.objects.filter(
-            topic_id=request.data['topic_id']
-        ).count()
-        if len_of_splitz == 0:
-            for data in aggregated_data:
-                splitz = SplitLedgerSerializer(data=data)
-                if splitz.is_valid():
-                    splitz.save()
-                    return Response(
-                        splitz.data,
-                        status=status.HTTP_201_CREATED
-                    )
-        else:
-            # for data in aggregated_data:
-
-            return Response(
-                splitz.errors,
-                status=status.HTTP_400_BAD_REQUEST
+        splitz_amount = {}
+        topic = Topic.objects.filter(id=request.data['topic_id'])
+        print (topic)
+        split_amount = (
+                topic[0].total_amount /
+                len(request.data['members_list'])
+            )
+        counter = 0
+        for user in request.data['members_list']:
+            contact = Contact.objects.filter(email=user)
+            splitz_amount['splitted_user'] = int(contact[0].id)
+            splitz_amount['splitted_amount'] = split_amount
+            splitz_amount['topic_id'] = request.data['topic_id']            
+            splitz_amount['created_by'] = request.user.id
+            splitz_amount['updated_by'] = request.user.id
+            splitz = SplitLedgerSerializer(data=splitz_amount)
+            if splitz.is_valid(raise_exception=True):
+                splitz.save()
+            counter += 1
+            if counter == len(request.data['members_list']):
+                break
+        return Response(
+            'Users added successfully',
+            status=status.HTTP_201_CREATED
             )
 
     def get(self, request):

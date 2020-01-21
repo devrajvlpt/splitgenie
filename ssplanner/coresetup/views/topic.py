@@ -2,10 +2,15 @@
 from __future__ import unicode_literals
 
 from coresetup.models.models import (
-    Topic,
-    TopicMembers
+    Topic,    
 )
-from rest_framework.views import APIView
+from django.shortcuts import get_object_or_404
+from rest_framework.views import (
+    APIView,
+)
+from rest_framework.generics import(
+    RetrieveAPIView,
+)
 from rest_framework.response import Response
 from rest_framework_jwt.utils import jwt_get_user_id_from_payload_handler
 from rest_framework import status
@@ -14,10 +19,10 @@ from rest_framework.permissions import (
     IsAuthenticated
 )
 from coresetup.serializers.serialiser import (
-    TopicSerializer,
-    TopicMemberSerializer,
+    TopicSerializer,    
     TopicDetailSerializer
 )
+from coresetup.models import SplitAmountLedger
 from coresetup.splitz.splitz_aggregator import (
     SplitzAggregator
 )
@@ -27,35 +32,39 @@ class TopicView(APIView):
     permission_classes = (IsAuthenticated, )
     splitz_aggregator = SplitzAggregator()
 
-    def post(self, request):     
-        print(request.data)
+    def post(self, request):             
         topic = TopicSerializer(data=request.data)
         if topic.is_valid(raise_exception=True):
             topic.save()
-            topic_member = {'current_user': request.user.id}
-            for user in request.data['members_list']:
-                topic_member['user'] = user
-                member_serialiser = TopicMemberSerializer(data=topic_member)
-                if member_serialiser.is_valid(raise_exception=True):
-                    member_serialiser.save()
-            request.data['topic_id'] = topic.data['id']
-            aggregated_data = TopicView.splitz_aggregator.set_splitted_amount(
-                request.data
+            return Response(
+                topic.data,
+                status=status.HTTP_201_CREATED
             )
-            if aggregated_data:
-                return Response(
-                    topic.data,
-                    status=status.HTTP_201_CREATED
-                )
         return Response(
             topic.errors,
             status=status.HTTP_400_BAD_REQUEST
         )
 
     def get(self, request):        
-        topics = Topic.objects.filter(created_by=request.user.id)
-        topicserializer = TopicDetailSerializer(topics, many=True)
+        splitzs = SplitAmountLedger.objects.filter(
+            splitted_user=request.user.id
+        ).all()
+        topics = []
+        for splitz in splitzs:
+            topic = Topic.objects.filter(
+                id=splitz.topic_id.id
+                ).first()
+            topicserializer = TopicDetailSerializer(topic)
+            topics.append(topicserializer.data)
         return Response(
-            topicserializer.data,
+            topics,
             status=status.HTTP_200_OK
-            )
+        )
+
+
+class TopicDetailView(RetrieveAPIView):
+    permission_classes = (IsAuthenticated,)    
+    queryset = Topic.objects.all()
+    serializer_class = TopicDetailSerializer
+
+    

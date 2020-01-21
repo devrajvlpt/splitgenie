@@ -6,14 +6,16 @@ from coresetup.views.register import (
    RegisterDetailView,
 )
 from coresetup.views.topic import (
-   TopicView
+   TopicView,
+   TopicDetailView
 )
 from coresetup.views.splitz import (
    SplitzView,
    SplitzDetailView
 )
 from coresetup.views.friends import (
-   FriendView
+   FriendView,
+   FriendDetailView
 )
 from coresetup.views.login import (
    ApplicationListView,
@@ -32,13 +34,15 @@ urlpatterns = [
    url('logout',     LogoutView.as_view(), name='login'),
    url('users',      RegisterView.as_view(), name='users'),
    url('userlist',   RegisterDetailView.as_view(), name='userlist'),
-   url('topic',      TopicView.as_view(), name='topic'),
+   url(r'^topicdetail/(?P<pk>\d+)/$', TopicDetailView.as_view(), name='topicdetail'),
+   url('topic',      TopicView.as_view(), name='topics'),
    path('splitz',     SplitzView.as_view(), name='splitz'),
-   path('splitz/<int:pk>',     SplitzDetailView.as_view(), name='splitzdetail'),
+   path('splitz/<int:pk>', SplitzDetailView.as_view(), name='splitzdetail'),
+   path('listfriends/<int:pk>', FriendDetailView.as_view(), name='listfriends'),   
    url('listfriend', FriendView.as_view(), name='listfriend'),
    url('createorder', OrderInterfaceView.as_view(), name='listfriend'),
    url(r'^applications', ApplicationListView.as_view()),
    url(r'^socialauth', SocialAuthAssociationView.as_view()),
 ]
 
-# urlpatterns = format_suffix_patterns(urlpatterns)
+urlpatterns = format_suffix_patterns(urlpatterns)
