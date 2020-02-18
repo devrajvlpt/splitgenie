@@ -3,6 +3,7 @@
 from coresetup.serializers.serialiser import ContactSerializer
 
 def jwt_response_payload_handler(token, user=None, request=None):
+    print (user)
     return {
         'token':token,
         'user':ContactSerializer(user, context={'request':request}).data

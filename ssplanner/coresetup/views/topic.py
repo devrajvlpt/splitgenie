@@ -20,7 +20,9 @@ from rest_framework.permissions import (
 )
 from coresetup.serializers.serialiser import (
     TopicSerializer,    
-    TopicDetailSerializer
+    TopicDetailSerializer,
+    SplitLedgerDetailSerializer,
+    SplitLedgerSerializer
 )
 from coresetup.models import SplitAmountLedger
 from coresetup.splitz.splitz_aggregator import (
@@ -45,19 +47,26 @@ class TopicView(APIView):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    def get(self, request):        
-        splitzs = SplitAmountLedger.objects.filter(
+    def get(self, request):
+
+        topic_created = Topic.objects.filter(
+            created_by=request.user.id
+            ).all()
+        list_topics = [topic for topic in topic_created]        
+        splitz_user = SplitAmountLedger.objects.filter(
             splitted_user=request.user.id
-        ).all()
-        topics = []
-        for splitz in splitzs:
-            topic = Topic.objects.filter(
+        ).exclude(created_by=request.user.id).all()
+        for splitz in splitz_user:
+            topic_participated = Topic.objects.filter(
                 id=splitz.topic_id.id
-                ).first()
-            topicserializer = TopicDetailSerializer(topic)
-            topics.append(topicserializer.data)
+            ).first()            
+            if list_topics:
+                list_topics.append(topic_participated)
+            else:
+                list_topics.append(topic_participated)        
+        topicserializer = TopicDetailSerializer(list_topics, many=True)
         return Response(
-            topics,
+            topicserializer.data,
             status=status.HTTP_200_OK
         )
 

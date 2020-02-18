@@ -15,6 +15,7 @@ from coresetup.models.models import (
 from oauth2_provider.models import Application
 from social_django.models import UserSocialAuth
 
+
 class ContactSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
         write_only=True,
@@ -26,18 +27,29 @@ class ContactSerializer(serializers.ModelSerializer):
     class Meta:
         model = Contact
         fields = '__all__'
+    
+    def update(self, instance, validated_data):
+        instance.email = validated_data.get('email', instance.email)
+        instance.mobile_number = validated_data.get('mobile_number', instance.mobile_number)
+        instance.user_name = validated_data.get('user_name', instance.user_name)
+        instance.first_name = validated_data.get('first_name', instance.first_name)
+        instance.last_name = validated_data.get('last_name', instance.last_name)
+        instance.set_password(validated_data['password'])
+        instance.is_active = True
+        instance.save()
+        return instance
 
-    def create(self, validated_data):
-        contact = Contact(
-            mobile_number=validated_data['mobile_number'],
-            last_login=datetime.now(),
-            email=validated_data['email'],
-            first_name=validated_data['first_name'],
-            last_name=validated_data['last_name'],
-        )
-        contact.set_password(validated_data['password'])
-        contact.save()
-        return contact
+    # def create(self, validated_data):
+    #     contact = Contact(
+    #         mobile_number=validated_data['mobile_number'],
+    #         last_login=datetime.now(),
+    #         email=validated_data['email'],
+    #         first_name=validated_data['first_name'],
+    #         last_name=validated_data['last_name'],
+    #     )
+    #     contact.set_password(validated_data['password'])
+    #     contact.save()
+    #     return contact
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -45,7 +57,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = Contact
         fields = [
-            'id', 'mobile_number', 'last_login',
+            'id', 'user_name', 'mobile_number', 'last_login',
             'email', 'first_name',
             'last_name', 'registered_time',
             ]
@@ -77,6 +89,7 @@ class TopicSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         topic = Topic(
             topic_name=validated_data['topic_name'],
+            topic_description=validated_data['topic_description'],
             total_amount=validated_data['total_amount'],
             created_by=validated_data['created_by'],
             updated_by=validated_data['updated_by']
@@ -120,6 +133,15 @@ class SplitLedgerSerializer(serializers.ModelSerializer):
     	model = SplitAmountLedger
     	fields = '__all__'
 
+    def update(self, instance, validated_data):
+        instance.splitted_amount = validated_data.get('splitted_amount', instance.splitted_amount)
+        instance.splitted_user = validated_data.get('splitted_user', instance.splitted_user)
+        instance.topic_id = validated_data.get('topic_id', instance.topic_id)
+        instance.created_by = validated_data.get('created_by', instance.created_by)
+        instance.updated_by = validated_data.get('updated_by', instance.updated_by)        
+        instance.save()
+        return instance
+
 
 class SplitLedgerDetailSerializer(serializers.ModelSerializer):
     topic_id = TopicSerializer(read_only=True)
@@ -156,7 +178,7 @@ class SocialAuthSerializer(serializers.ModelSerializer):
 
 
 class LoginSerializer(serializers.Serializer):
-    mobile_number = serializers.IntegerField()
+    user_name = serializers.CharField(max_length=240)
     password = serializers.CharField(max_length=128, write_only=True)
     token = serializers.CharField(max_length=255, read_only=True)
 
@@ -167,10 +189,11 @@ class LoginSerializer(serializers.Serializer):
         # and password and that this combination matches one of the users in
         # our database.
         print(data, 'serializer valid method')
-        mobile_number = data.get('mobile_number', None)
-        print(mobile_number)
+        user_name = data.get('user_name', None)
+        print(type(user_name))
         # email = data.get('email', None)
         password = data.get('password', None)
+        mobile_number = data.get('mobile_number', None)
 
         # Raise an exception if an
         # email is not provided.
@@ -178,7 +201,7 @@ class LoginSerializer(serializers.Serializer):
         #     raise serializers.ValidationError(
         #         'An email address is required to log in.'
         #     )
-        if mobile_number is None:
+        if user_name is None:
             raise serializers.ValidationError(
                 'A Mobile Number is required to log in'
             )
@@ -193,7 +216,11 @@ class LoginSerializer(serializers.Serializer):
         # for a user that matches this email/password combination. Notice how
         # we pass `email` as the `username` value since in our User
         # model we set `USERNAME_FIELD` as `email`.
-        user = authenticate(mobile_number=mobile_number, password=password)
+        user = authenticate(
+            # mobile_number=mobile_number,
+            user_name=user_name,
+            password=password
+        )
         print(user, 'RAIN BUCKET')
 
         # If no user was found matching this email/password combination then
@@ -217,7 +244,7 @@ class LoginSerializer(serializers.Serializer):
         # that we will see later on.
         print(user.first_name)
         return {
-            'mobile_number': user.mobile_number,
+            'user_name': user.user_name,
             'first_name': user.first_name,
             'token': user.token
         }

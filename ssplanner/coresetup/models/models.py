@@ -6,7 +6,6 @@ from __future__ import unicode_literals
 import jwt
 
 from django.db import models
-from django.contrib.auth.models import User
 from datetime import datetime, timedelta
 from django.conf import settings
 from django.utils.timezone import now
@@ -21,7 +20,22 @@ class ContactManager(BaseUserManager):
     """Summary
     """
 
-    def create_user(self, mobile_number, password=None):
+    def normalize_mobile_number(self, mobile_number, country_code=None):
+        mobile_number = mobile_number.strip().lower()
+        try:
+            import phonenumbers
+            phone_number = phonenumbers.parse(
+                    mobile_number,
+                    country_code
+            )
+            phone = phonenumbers.format_number(
+                phone_number, phonenumbers.PhoneNumberFormat.E164
+            )
+        except ImportError:
+            pass
+        return phone
+
+    def create_user(self, user_name, password=None):
         """
         Creates and saves a User with the given mobile_number and password.
 
@@ -35,11 +49,22 @@ class ContactManager(BaseUserManager):
         Raises:
             ValueError: Description
         """
-        if not mobile_number:
-            raise ValueError('Users must have an mobile_number address')
-        print ("I'm here for the break")
+        if not user_name:
+            raise ValueError('Users must have an mobile_number or email address')
+        
+        if "@" in user_name:
+            print("im coming as email")            
+            user_name = self.normalize_email(user_name)
+            user_name, email, mobile_number = (user_name, user_name, "")
+        else:
+            print("im coming as mobile_number")
+            user_name = self.normalize_mobile_number(user_name, country_code="IN")
+            user_name, email, mobile_number = (user_name, "", user_name)
+
         user = self.model(
-            mobile_number=self.normalize_mobile_number(mobile_number),
+            user_name=user_name,
+            email=email,
+            mobile_number=mobile_number,
             last_login=self.auto_now()
         )
 
@@ -47,7 +72,7 @@ class ContactManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_staffuser(self, mobile_number, password):
+    def create_splitzuser(self, user_name, password):
         """
         Creates and saves a staff user with the
         given mobile_number and password.
@@ -56,17 +81,30 @@ class ContactManager(BaseUserManager):
             password (TYPE): Description
         Returns:
             TYPE: Description
-        """
-        user = self.create_user(
-            mobile_number,
-            password=password,
+        """        
+        if not user_name:
+            raise ValueError('Users must have an mobile_number or email address')
+        
+        if "@" in user_name:
+            user_name = self.normalize_email(user_name)
+            user_name, email, mobile_number = (user_name, user_name, "")
+        else:
+            user_name = self.normalize_mobile_number(user_name, country_code="IN")
+            user_name, email, mobile_number = (user_name, "", user_name)
+
+        user = self.model(
+            user_name=user_name,
+            email=email,
+            mobile_number=mobile_number,
             last_login=self.auto_now()
         )
+        user.is_active = False
         user.staff = True
+        user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, mobile_number, password):
+    def create_superuser(self, user_name, password):
         """
         Creates and saves a superuser with
         the given mobile_number and password.
@@ -76,10 +114,23 @@ class ContactManager(BaseUserManager):
         Returns:
             TYPE: Description
         """
-        user = self.create_user(
-            mobile_number,
-            password=password,
+        if not user_name:
+            raise ValueError('Users must have an mobile_number or email address')
+        
+        if "@" in user_name:
+            user_name = self.normalize_email(user_name)
+            user_name, email, mobile_number = (user_name, user_name, "")
+        else:
+            user_name = self.normalize_mobile_number(user_name, country_code="IN")
+            user_name, email, mobile_number = (user_name, "", user_name)
+
+        user = self.model(
+            user_name=user_name,
+            email=email,
+            mobile_number=mobile_number,
+            last_login=self.auto_now()
         )
+
         user.staff = True
         user.admin = True
         user.save(using=self._db)
@@ -95,15 +146,16 @@ class Contact(AbstractBaseUser):
         objects (TYPE): Description
     """
     objects = ContactManager()
-    mobile_number = models.IntegerField(unique=True)
-    email = models.EmailField(max_length=254, unique=True, default='')
+    user_name = models.CharField(max_length=255, unique=True, default='')
+    mobile_number = models.BigIntegerField(blank=True, default=0)
+    email = models.EmailField(max_length=254, blank=True, default='')
     first_name = models.CharField(max_length=120, default='')
     last_name = models.CharField(max_length=120, default='')
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)    
     registered_time = models.DateTimeField(default=datetime.now())
-    USERNAME_FIELD = 'mobile_number'
+    USERNAME_FIELD = "user_name"
 
     def __str__(self):
         """
@@ -112,9 +164,9 @@ class Contact(AbstractBaseUser):
         This string is used when a `User` is printed in the console.
         """
         user = {
-            'mobile_number':self.mobile_number,
-            'first_name':self.first_name,
-            'token':self.token
+            'user_name': self.user_name,
+            'first_name': self.first_name,
+            'last_name': self.last_name
         }
         return str(user)
 
@@ -187,7 +239,11 @@ class Topic(models.Model):
         max_length=240,
         default="splitztopic"
     )
-    total_amount = models.IntegerField()    
+    topic_description = models.CharField(
+        max_length=240,
+        default="Sharing with Friends and Families"
+    )    
+    total_amount = models.IntegerField()
     created_by = models.ForeignKey(
                             settings.AUTH_USER_MODEL,
                             related_name='topic_created',
