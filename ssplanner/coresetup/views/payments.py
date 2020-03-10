@@ -21,7 +21,7 @@ class OrderInterfaceView(APIView):
     permission_classes = (AllowAny, )
 
     def post(self, request):
-        # DATA = { 
+        # { 
         #     'amount': 50000,
         #     'currency': 'INR',
         #     'receipt': 'order_rcptid_11',
@@ -29,6 +29,8 @@ class OrderInterfaceView(APIView):
         #     'payment_capture': 1
         # }
         response = CLIENT.order.create(data=request.data)
+        # if response:
+
         return Response(response, status.HTTP_201_CREATED)
 
     def get(self, request):

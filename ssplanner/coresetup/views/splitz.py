@@ -109,11 +109,15 @@ class SplitzView(APIView):
 class SplitzDetailView(APIView):
     permission_classes = (AllowAny,)
 
-    def get(self, request, pk, format=None):        
+    def get(self, request, pk, format=None):
         splitz_details = SplitAmountLedger.objects.filter(
             topic_id=pk,
-            ).exclude(splitted_user=request.user.id)
-        splitzserializer = SplitLedgerDetailSerializer(splitz_details, many=True)
+            splitted_user=request.user.id
+            )
+        splitzserializer = SplitLedgerDetailSerializer(
+            splitz_details,
+            many=True
+        )
         return Response(
             splitzserializer.data,
             status=status.HTTP_200_OK

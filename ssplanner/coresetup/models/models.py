@@ -292,3 +292,44 @@ class SplitAmountLedger(models.Model):
                         )
     created_at = models.DateTimeField(auto_now_add=True)    
     updated_at = models.DateTimeField(auto_now=True)
+
+
+class SplitOrder(models.Model):
+
+    order_id = models.IntegerField(blank=False, unique=True)
+    entity = models.CharField(max_length=80, blank=True, default='')    
+    amount = models.IntegerField(blank=True, default=0)
+    amount_paid = models.IntegerField(blank=True, default=0)
+    amount_due = models.IntegerField(blank=True, default=0)
+    currency = models.CharField(max_length=80, blank=True, default='')
+    attempts = models.IntegerField(blank=False, default=0)
+    status = models.CharField(max_length=80, blank=True, default="error")
+    receipt = models.CharField(max_length=80, blank=True, default='')
+    offer_id = models.CharField(max_length=240, blank=True, default='')
+    notes = models.CharField(max_length=254, blank=True, default='')
+    payment_capture = models.BooleanField(default=True)
+    order_created = models.DateTimeField(default=datetime.now())
+    created_by = models.ForeignKey(
+                            settings.AUTH_USER_MODEL,
+                            related_name='order_created',
+                            on_delete=models.CASCADE
+                        )
+    updated_by = models.ForeignKey(
+                            settings.AUTH_USER_MODEL,
+                            related_name='order_updated',
+                            on_delete=models.CASCADE
+                        )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+
+        return str("{} - {}".format(self.amount, self.currency))
+
+    def has_perm(self, perm, obj=None):
+        if self.is_active:
+            return True
+
+    def has_module_perms(self, app_label):
+        if self.is_active:
+            return True
