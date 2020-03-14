@@ -296,7 +296,7 @@ class SplitAmountLedger(models.Model):
 
 class SplitOrder(models.Model):
 
-    order_id = models.IntegerField(blank=False, unique=True)
+    order_id = models.CharField(max_length=80, blank=True, default='', unique=True)
     entity = models.CharField(max_length=80, blank=True, default='')    
     amount = models.IntegerField(blank=True, default=0)
     amount_paid = models.IntegerField(blank=True, default=0)
@@ -323,13 +323,4 @@ class SplitOrder(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-
         return str("{} - {}".format(self.amount, self.currency))
-
-    def has_perm(self, perm, obj=None):
-        if self.is_active:
-            return True
-
-    def has_module_perms(self, app_label):
-        if self.is_active:
-            return True

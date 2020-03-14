@@ -10,7 +10,8 @@ from coresetup.models.models import (
     Contact,
     Topic,    
     SplitAmountLedger,
-    Friend
+    Friend,
+    SplitOrder
 )
 from oauth2_provider.models import Application
 from social_django.models import UserSocialAuth
@@ -39,17 +40,20 @@ class ContactSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
-    # def create(self, validated_data):
-    #     contact = Contact(
-    #         mobile_number=validated_data['mobile_number'],
-    #         last_login=datetime.now(),
-    #         email=validated_data['email'],
-    #         first_name=validated_data['first_name'],
-    #         last_name=validated_data['last_name'],
-    #     )
-    #     contact.set_password(validated_data['password'])
-    #     contact.save()
-    #     return contact
+    def create(self, validated_data):        
+        contact = Contact(
+            mobile_number=validated_data['mobile_number'],
+            last_login=datetime.now(),
+            email=validated_data['email'],
+            user_name=validated_data['user_name'],
+            first_name=validated_data['first_name'],
+            last_name=validated_data['last_name'],
+            is_staff=True,
+            is_active=True,            
+        )
+        contact.set_password(validated_data['password'])
+        contact.save()
+        return contact
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -248,3 +252,52 @@ class LoginSerializer(serializers.Serializer):
             'first_name': user.first_name,
             'token': user.token
         }
+
+
+class SplitOrderSerializer(serializers.ModelSerializer):
+    # id = serializers.Field(source="order_id")
+
+    class Meta:
+        model = SplitOrder
+        fields = (
+            "order_id",
+            "entity",
+            "amount",
+            "amount_paid",
+            "amount_due",
+            "currency",
+            "attempts",
+            "status",
+            "receipt",
+            "offer_id",
+            "notes",
+            "payment_capture",
+            "order_created",
+            "created_by",
+            "updated_by",
+            "created_at",
+            "updated_at",
+        )
+    
+    def create(self, validated_data):
+        splitorder = SplitOrder(
+            order_id = validated_data['order_id'],
+            entity = validated_data['entity'],
+            amount = validated_data['amount'],
+            amount_paid = validated_data['amount_paid'],
+            amount_due = validated_data['amount_due'],
+            currency = validated_data['currency'],
+            attempts = validated_data['attempts'],
+            status = validated_data['status'],
+            receipt = validated_data['receipt'],
+            offer_id = validated_data['offer_id'],
+            notes = validated_data['notes'],
+            payment_capture = validated_data['payment_capture'],
+            order_created = validated_data['order_created'] or datetime.now(),
+            created_by = validated_data['created_by'],
+            updated_by = validated_data['updated_by'],
+            # created_at = validated_data['created_at'],
+            # updated_at  = validated_data['created_at']
+        )
+        splitorder.save()
+        return splitorder

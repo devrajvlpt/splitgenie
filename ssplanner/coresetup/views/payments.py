@@ -8,7 +8,10 @@ from rest_framework import status
 from rest_framework.permissions import (    
     AllowAny
 )
+from coresetup.models.models import SplitOrder
+from coresetup.serializers.serialiser import SplitOrderSerializer
 import razorpay
+from datetime import datetime
 
 #Gloabl variable for razorpay client
 CLIENT = razorpay.Client(
@@ -29,9 +32,34 @@ class OrderInterfaceView(APIView):
         #     'payment_capture': 1
         # }
         response = CLIENT.order.create(data=request.data)
-        # if response:
+        if response:
+            response["order_id"] = response["id"]
+            response['created_by'] = request.user.id or 4
+            response['updated_by'] = request.user.id or 4
+            response['notes'] = str(response['notes'])
+            response['offer_id'] = ""
+            if not response.get('payment_capture', ''):                
+                response["payment_capture"] = False
+            if not response.get('order_created', ''):
+                response["order_created"] = datetime.now()                
+            if response['id'] and response['created_at']:
+                del response['id']
+                del response['created_at']
+            # response['created_at'] = datetime.now()
+            # response['updated_at'] = datetime.now()
 
-        return Response(response, status.HTTP_201_CREATED)
+            print (response)
+            splitorderserializer = SplitOrderSerializer(data=response)
+            print (splitorderserializer.is_valid())
+            if splitorderserializer.is_valid(raise_exception=True):
+                splitorderserializer.save()
+                return Response(
+                    splitorderserializer.data,
+                    status=status.HTTP_201_CREATED
+                )
+            else:
+                print (splitorderserializer)
+                return Response("{}", status.HTTP_400_BAD_REQUEST)
 
     def get(self, request):
 

@@ -108,16 +108,38 @@ class SplitzView(APIView):
 
 class SplitzDetailView(APIView):
     permission_classes = (AllowAny,)
+    model = SplitAmountLedger
+    admin = False
 
-    def get(self, request, pk, format=None):
-        splitz_details = SplitAmountLedger.objects.filter(
-            topic_id=pk,
-            splitted_user=request.user.id
+    def admin_user(func):
+        def wrapper(*args, **kwargs):
+            admin = args[0].model.objects.filter(
+                created_by=args[1].user.id,
+                topic_id=kwargs['pk']
             )
+            if admin:
+                args[0].admin = True
+                return func(*args, **kwargs)
+            return func(*args, **kwargs)
+        return wrapper
+
+    @admin_user
+    def get(self, request, pk, format=None):   
+        splitz_details = SplitAmountLedger.objects.filter(
+            topic_id=pk
+        ).all()
+        if self.admin:                
+            splitz_details = [details for details in splitz_details if details.created_by_id==request.user.id]
+        else:
+            splitz_details = [details for details in splitz_details if details.splitted_user_id==request.user.id]
+        
         splitzserializer = SplitLedgerDetailSerializer(
             splitz_details,
             many=True
         )
+        
+        for data in splitzserializer.data:
+            data["admin"] = self.admin        
         return Response(
             splitzserializer.data,
             status=status.HTTP_200_OK
