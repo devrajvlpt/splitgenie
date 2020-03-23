@@ -17,7 +17,12 @@ from datetime import datetime
 CLIENT = razorpay.Client(
             auth=("rzp_test_XwIPUhyvVzTXkX", "ip1f8P4CBrSwMX00DINeHsuF")
         )
-
+CLIENT.set_app_details(
+    {
+        "title":"Splitz",
+        "version":"v.0.0.1"
+    }
+)
 
 class OrderInterfaceView(APIView):
 

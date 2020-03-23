@@ -258,6 +258,29 @@ class Topic(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 
+class SubTopic(models.Model):
+    sub_topicname = models.CharField(max_length=120, default="Untitled")
+    sub_topicamount = models.IntegerField()
+    sub_topicdescription = models.CharField(max_length=240, default="Untitled")
+    topic_id = models.ForeignKey(
+            Topic,
+            related_name='sub_topic_topic',
+            on_delete=models.CASCADE,
+            blank=True
+    )
+    created_by = models.ForeignKey(
+                            settings.AUTH_USER_MODEL,
+                            related_name='subtopic_created',
+                            on_delete=models.CASCADE,
+                        )
+    updated_by = models.ForeignKey(
+                            settings.AUTH_USER_MODEL,
+                            related_name='subtopic_updated',
+                            on_delete=models.CASCADE
+                        )
+    created_at = models.DateTimeField(auto_now_add=True)    
+    updated_at = models.DateTimeField(auto_now=True)
+
 class SplitAmountLedger(models.Model):
 
     """List of splitted amount to each user under same topic
@@ -275,10 +298,11 @@ class SplitAmountLedger(models.Model):
                                 on_delete=models.CASCADE
                             )
     splitted_amount = models.IntegerField()
-    topic_id = models.ForeignKey(
-            Topic,
-            related_name='sa_ledger_topic',
-            on_delete=models.CASCADE
+    sub_topic_id = models.ForeignKey(
+            SubTopic,
+            related_name='sub_topic_ledger',
+            on_delete=models.CASCADE,
+            blank=True
     )
     created_by = models.ForeignKey(
                             settings.AUTH_USER_MODEL,

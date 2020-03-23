@@ -20,7 +20,6 @@ class RegisterView(APIView):
     permission_classes = (AllowAny,)
 
     def post(self, request):
-
         contact_exists = Contact.objects.filter(
             user_name=request.data['user_name']
         ).first()
