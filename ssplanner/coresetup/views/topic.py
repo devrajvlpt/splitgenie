@@ -32,8 +32,6 @@ from coresetup.splitz.splitz_aggregator import (
 
 class TopicView(APIView):
     permission_classes = (IsAuthenticated, )
-    splitz_aggregator = SplitzAggregator()
-
     def post(self, request):             
         topic = TopicSerializer(data=request.data)
         if topic.is_valid(raise_exception=True):
@@ -48,22 +46,10 @@ class TopicView(APIView):
         )
 
     def get(self, request):
-
         topic_created = Topic.objects.filter(
             created_by=request.user.id
             ).all()
-        list_topics = [topic for topic in topic_created]        
-        splitz_user = SplitAmountLedger.objects.filter(
-            splitted_user=request.user.id
-        ).exclude(created_by=request.user.id).all()
-        for splitz in splitz_user:
-            topic_participated = Topic.objects.filter(
-                id=splitz.topic_id.id
-            ).first()            
-            if list_topics:
-                list_topics.append(topic_participated)
-            else:
-                list_topics.append(topic_participated)        
+        list_topics = [topic for topic in topic_created]
         topicserializer = TopicDetailSerializer(list_topics, many=True)
         return Response(
             topicserializer.data,
@@ -72,7 +58,7 @@ class TopicView(APIView):
 
 
 class TopicDetailView(RetrieveAPIView):
-    permission_classes = (IsAuthenticated,)    
+    permission_classes = (IsAuthenticated,)
     queryset = Topic.objects.all()
     serializer_class = TopicDetailSerializer
 

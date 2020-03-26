@@ -9,6 +9,9 @@ from coresetup.views.topic import (
    TopicView,
    TopicDetailView
 )
+from coresetup.views.subtopic import(
+   SubSectionView,
+)
 from coresetup.views.splitz import (
    SplitzView,
    SplitzDetailView
@@ -32,6 +35,7 @@ urlpatterns = [
    # URL from Login View
    url('login',      LoginView.as_view(), name='login'),
    url('logout',     LogoutView.as_view(), name='login'),
+   url('subsection',      SubSectionView.as_view(), name='subsections'),
    url('users',      RegisterView.as_view(), name='users'),
    path('user/<int:pk>',   RegisterDetailView.as_view(), name='userlist'),
    url(r'^topicdetail/(?P<pk>\d+)/$', TopicDetailView.as_view(), name='topicdetail'),

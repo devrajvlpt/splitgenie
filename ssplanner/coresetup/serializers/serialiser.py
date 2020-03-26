@@ -8,7 +8,8 @@ from django.contrib.auth import authenticate
 # Create your views here.
 from coresetup.models.models import (
     Contact,
-    Topic,    
+    Topic,
+    SubTopic,
     SplitAmountLedger,
     Friend,
     SplitOrder
@@ -91,6 +92,7 @@ class TopicSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def create(self, validated_data):
+        print(validated_data)
         topic = Topic(
             topic_name=validated_data['topic_name'],
             topic_description=validated_data['topic_description'],
@@ -100,7 +102,7 @@ class TopicSerializer(serializers.ModelSerializer):
         )      
         topic.save()
         return topic
-
+        
 
 class TopicDetailSerializer(serializers.ModelSerializer):
     """Summary
@@ -114,6 +116,43 @@ class TopicDetailSerializer(serializers.ModelSerializer):
         """
         model = Topic
         fields = '__all__'
+
+
+class SubTopicSerializer(serializers.ModelSerializer):
+
+
+    class Meta:
+        model = SubTopic
+        fields = (
+            "id",
+            "sub_topicname",
+            "sub_topicamount",
+            "sub_topicdescription",
+            "topic_id",
+            "created_by",
+            "updated_by",
+            "created_at",
+            "updated_at",
+        )
+
+    def create(self, validated_data):
+        print (validated_data)
+        sub_topic = SubTopic(
+            sub_topicname=validated_data['sub_topicname'],
+            sub_topicdescription=validated_data['sub_topicdescription'],
+            sub_topicamount=validated_data['sub_topicamount'],
+            topic_id=validated_data['topic_id'],
+            created_by=validated_data['created_by'],
+            updated_by=validated_data['updated_by']
+        )      
+        sub_topic.save()
+        return sub_topic
+
+class SubTopicDetailSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = SubTopic
+        fields = "__all__"
 
 
 class SplitLedgerSerializer(serializers.ModelSerializer):
@@ -148,7 +187,7 @@ class SplitLedgerSerializer(serializers.ModelSerializer):
 
 
 class SplitLedgerDetailSerializer(serializers.ModelSerializer):
-    topic_id = TopicSerializer(read_only=True)
+    sub_topic_id = SubTopicSerializer(read_only=True)
     splitted_user = UserSerializer(read_only=True)
     created_by = UserSerializer(read_only=True)
     updated_by = UserSerializer(read_only=True)
