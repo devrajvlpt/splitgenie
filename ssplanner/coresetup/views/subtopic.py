@@ -32,9 +32,7 @@ class SubSectionView(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
-        print(request.data)
         sub_topic = SubTopicSerializer(data=request.data)
-        print(sub_topic.is_valid())
         if sub_topic.is_valid(raise_exception=True):
             sub_topic.save()
             return Response(

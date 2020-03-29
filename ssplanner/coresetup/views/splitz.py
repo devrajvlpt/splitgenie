@@ -32,66 +32,25 @@ class SplitzView(APIView):
         splitz_amount = {}
         topic = Topic.objects.filter(id=request.data['sub_topic_id']).first()        
         sub_topic = SubTopic.objects.filter(topic_id=topic.id).first()
-        split_exists = SplitAmountLedger.objects.filter(
-            sub_topic_id=sub_topic.id
-        ).all()        
-        split_amount = round(
-                sub_topic.sub_topicamount /
-                len(request.data['members_list']) + len(split_exists)
-            )
-        counter = 0
-        if split_exists:
-            for user in request.data['members_list']:
-                contact, created = Contact.objects.get_or_create(
-                    user_name=user
-                )     
-                if not created:
-                    contact.is_active = False
-                    contact.save()
-                    splitz_amount['splitted_user'] = int(contact.id)
-                else:
-                    splitz_amount['splitted_user'] = int(contact.id)
-                splitz_amount['splitted_amount'] = int(split_amount)
-                splitz_amount['sub_topic_id'] = sub_topic.id
-                splitz_amount['created_by'] = request.user.id
-                splitz_amount['updated_by'] = request.user.id
-                splitz = SplitLedgerSerializer(data=splitz_amount)
-                if splitz.is_valid(raise_exception=True):
-                    splitz.save()
-                counter += 1
-                if counter == len(request.data['members_list']):
-                    break
-            for exists_user in split_exists:
-                splitz_amount['splitted_user'] = int(exists_user.splitted_user.id)
-                splitz_amount['splitted_amount'] = int(exists_user.splitted_amount)
-                splitz_amount['sub_topic_id'] = exists_user.sub_topic_id.id
-                splitz_amount['created_by'] = request.user.id
-                splitz_amount['updated_by'] = request.user.id
-                splitz = SplitLedgerSerializer(data=splitz_amount)
-                if splitz.is_valid(raise_exception=True):
-                    splitz.save()
-        else:
-            for user in request.data['members_list']:
-                contact, created = Contact.objects.get_or_create(
-                    user_name=user
-                )                
-                if not created:
-                    contact.is_active = False
-                    contact.save()
-                    splitz_amount['splitted_user'] = int(contact.id)
-                else:
-                    splitz_amount['splitted_user'] = int(contact.id)
-                splitz_amount['splitted_amount'] = int(split_amount)
-                splitz_amount['sub_topic_id'] = sub_topic.id
-                splitz_amount['created_by'] = request.user.id
-                splitz_amount['updated_by'] = request.user.id
-                splitz = SplitLedgerSerializer(data=splitz_amount)
-                if splitz.is_valid(raise_exception=True):
-                    splitz.save()
-                counter += 1
-                if counter == len(request.data['members_list']):
-                    break
-
+        
+        for user in request.data['members_list']:
+            contact, created = Contact.objects.get_or_create(
+                user_name=user
+            )     
+            if not created:
+                contact.is_active = False
+                contact.save()
+                splitz_amount['splitted_user'] = int(contact.id)
+            else:
+                splitz_amount['splitted_user'] = int(contact.id)
+            splitz_amount['splitted_amount'] = request.data['amount']
+            splitz_amount['sub_topic_id'] = sub_topic.id
+            splitz_amount['created_by'] = request.user.id
+            splitz_amount['updated_by'] = request.user.id
+            splitz = SplitLedgerSerializer(data=splitz_amount)
+            if splitz.is_valid(raise_exception=True):
+                splitz.save()
+        
         return Response(
             'Users added successfully',
             status=status.HTTP_201_CREATED

@@ -53,11 +53,9 @@ class ContactManager(BaseUserManager):
             raise ValueError('Users must have an mobile_number or email address')
         
         if "@" in user_name:
-            print("im coming as email")            
             user_name = self.normalize_email(user_name)
             user_name, email, mobile_number = (user_name, user_name, "")
         else:
-            print("im coming as mobile_number")
             user_name = self.normalize_mobile_number(user_name, country_code="IN")
             user_name, email, mobile_number = (user_name, "", user_name)
 

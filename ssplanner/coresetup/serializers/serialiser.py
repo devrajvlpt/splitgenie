@@ -92,7 +92,6 @@ class TopicSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def create(self, validated_data):
-        print(validated_data)
         topic = Topic(
             topic_name=validated_data['topic_name'],
             topic_description=validated_data['topic_description'],
@@ -136,7 +135,6 @@ class SubTopicSerializer(serializers.ModelSerializer):
         )
 
     def create(self, validated_data):
-        print (validated_data)
         sub_topic = SubTopic(
             sub_topicname=validated_data['sub_topicname'],
             sub_topicdescription=validated_data['sub_topicdescription'],
@@ -231,9 +229,7 @@ class LoginSerializer(serializers.Serializer):
         # user in, this means validating that they've provided an email
         # and password and that this combination matches one of the users in
         # our database.
-        print(data, 'serializer valid method')
         user_name = data.get('user_name', None)
-        print(type(user_name))
         # email = data.get('email', None)
         password = data.get('password', None)
         mobile_number = data.get('mobile_number', None)
@@ -264,7 +260,6 @@ class LoginSerializer(serializers.Serializer):
             user_name=user_name,
             password=password
         )
-        print(user, 'RAIN BUCKET')
 
         # If no user was found matching this email/password combination then
         # `authenticate` will return `None`. Raise an exception in this case.
@@ -285,7 +280,6 @@ class LoginSerializer(serializers.Serializer):
         # The `validate` method should return a dictionary of validated data.
         # This is the data that is passed to the `create` and `update` methods
         # that we will see later on.
-        print(user.first_name)
         return {
             'user_name': user.user_name,
             'first_name': user.first_name,

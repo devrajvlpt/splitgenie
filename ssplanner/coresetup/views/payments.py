@@ -49,13 +49,8 @@ class OrderInterfaceView(APIView):
                 response["order_created"] = datetime.now()                
             if response['id'] and response['created_at']:
                 del response['id']
-                del response['created_at']
-            # response['created_at'] = datetime.now()
-            # response['updated_at'] = datetime.now()
-
-            print (response)
+                del response['created_at']            
             splitorderserializer = SplitOrderSerializer(data=response)
-            print (splitorderserializer.is_valid())
             if splitorderserializer.is_valid(raise_exception=True):
                 splitorderserializer.save()
                 return Response(
@@ -63,7 +58,6 @@ class OrderInterfaceView(APIView):
                     status=status.HTTP_201_CREATED
                 )
             else:
-                print (splitorderserializer)
                 return Response("{}", status.HTTP_400_BAD_REQUEST)
 
     def get(self, request):
