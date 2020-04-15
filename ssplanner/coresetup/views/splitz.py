@@ -30,9 +30,7 @@ class SplitzView(APIView):
 
     def post(self, request):
         splitz_amount = {}
-        topic = Topic.objects.filter(id=request.data['sub_topic_id']).first()        
-        sub_topic = SubTopic.objects.filter(topic_id=topic.id).first()
-        
+        sub_topic = SubTopic.objects.filter(id=request.data['sub_topic_id']).first()        
         for user in request.data['members_list']:
             contact, created = Contact.objects.get_or_create(
                 user_name=user
