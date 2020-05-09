@@ -88,29 +88,39 @@ class SplitzDetailView(APIView):
 
     @admin_user
     def get(self, request, pk, format=None):
-        sub_topic = SubTopic.objects.filter(
+        sub_topics = SubTopic.objects.filter(
             topic_id=pk
-        ).first()
-        if sub_topic:
-            splitz_details = SplitAmountLedger.objects.filter(
-                sub_topic_id=sub_topic.id
-            ).all()
-            if self.admin:                
-                splitz_details = [details for details in splitz_details if details.created_by_id==request.user.id]
-            else:
-                splitz_details = [details for details in splitz_details if details.splitted_user_id==request.user.id]
-            
-            splitzserializer = SplitLedgerDetailSerializer(
-                splitz_details,
-                many=True
-            )
-            
-            for data in splitzserializer.data:
-                data["admin"] = self.admin
-            return Response(
-                splitzserializer.data,
-                status=status.HTTP_200_OK
+        ).all()
+        
+        if len(sub_topics) > 0:
+            splitz_details = []
+            for sub in sub_topics:
+                splitz_sub = SplitAmountLedger.objects.filter(
+                    sub_topic_id=sub.id
+                ).all()
+                splitz_details.extend(splitz_sub)
+            if splitz_details:                
+                if self.admin:
+                    splitz_details = [details for details in splitz_details if details.created_by_id==request.user.id]
+                else:
+                    splitz_details = [details for details in splitz_details if details.splitted_user_id==request.user.id]
+                
+                splitzserializer = SplitLedgerDetailSerializer(
+                    splitz_details,
+                    many=True
                 )
+                
+                for data in splitzserializer.data:
+                    data["admin"] = self.admin                
+                return Response(
+                    splitzserializer.data,
+                    status=status.HTTP_200_OK
+                    )
+            else:
+                return Response(
+                    [],
+                    status=status.HTTP_200_OK
+                    )
         else:
             return Response(
                 [],
