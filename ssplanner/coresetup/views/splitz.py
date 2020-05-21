@@ -30,8 +30,9 @@ class SplitzView(APIView):
 
     def post(self, request):
         splitz_amount = {}
-        sub_topic = SubTopic.objects.filter(id=request.data['sub_topic_id']).first()        
-        for user in request.data['members_list']:
+        sub_topic = SubTopic.objects.filter(id=request.data['sub_topic_id']).first()
+        
+        for user in request.data['members_list']:            
             contact, created = Contact.objects.get_or_create(
                 user_name=user
             )     
@@ -40,15 +41,23 @@ class SplitzView(APIView):
                 contact.save()
                 splitz_amount['splitted_user'] = int(contact.id)
             else:
-                splitz_amount['splitted_user'] = int(contact.id)
+                splitz_amount['splitted_user'] = int(contact.id)            
             splitz_amount['splitted_amount'] = request.data['amount']
+            splitz_amount['splitted_descriptions'] = request.data['splitted_descriptions']
             splitz_amount['sub_topic_id'] = sub_topic.id
             splitz_amount['created_by'] = request.user.id
             splitz_amount['updated_by'] = request.user.id
             splitz = SplitLedgerSerializer(data=splitz_amount)
             if splitz.is_valid(raise_exception=True):
                 splitz.save()
+            # update subtopic amount everytime a new user added
+            sub_topic.sub_topicamount += int(request.data['amount'])
         
+        # Finall updated on the total amount
+        sub_topic.save()
+
+        # TODO Need to work on failure cases. Only success cases handled
+
         return Response(
             'Users added successfully',
             status=status.HTTP_201_CREATED

@@ -296,6 +296,7 @@ class SplitAmountLedger(models.Model):
                                 on_delete=models.CASCADE
                             )
     splitted_amount = models.IntegerField()
+    splitted_descriptions = models.CharField(max_length=80, blank=True, default='')
     sub_topic_id = models.ForeignKey(
             SubTopic,
             related_name='sub_topic_ledger',
