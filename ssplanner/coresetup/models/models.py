@@ -70,7 +70,7 @@ class ContactManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_splitzuser(self, user_name, password):
+    def create_splitzuser(self, user_name, password):        
         """
         Creates and saves a staff user with the
         given mobile_number and password.

@@ -137,4 +137,48 @@ class SplitzDetailView(APIView):
                 )
 
 
-    
+class SplitzSubTopic(APIView):
+    permission_classes = (AllowAny,)
+
+    def post(self, request):
+        # Get the sub_topic_id and calulated the splitted amount across the users
+        sub_topic_id = request.data['sub_topic_id']
+        pre_splitz_amount = SplitAmountLedger.objects.filter(
+                sub_topic_id=sub_topic_id
+            ).all()
+        if pre_splitz_amount:
+            # finding the common sum amongst them
+            pre_total_sum = 0
+            common_sum = 0
+            for sub in pre_splitz_amount:
+                pre_total_sum += sub.splitted_amount
+                common_sum = pre_total_sum / len(pre_splitz_amount)
+
+            # Using common sum we can calulate owe and spent
+            for owe_spent in pre_splitz_amount:
+                if owe_spent.splitted_amount > common_sum:
+                    owe_spent.owe = 0
+                    owe_spent.spent = owe_spent.splitted_amount - common_sum
+                elif owe_spent.splitted_amount < common_sum:
+                    owe_spent.owe = common_sum - owe_spent.splitted_amount
+                    owe_spent.spent = 0
+                elif owe_spent.splitted_amount == common_sum:
+                    owe_spent.owe = 0
+                    owe_spent.spent = 0
+            
+            # calulate the actual splitz
+            for final_sum  in pre_splitz_amount:
+                list_of_owes_users = []
+                list_of_gains_users = []
+                for match in pre_splitz_amount:
+                    if match.owe > 0:
+                        if match.owe >= final_sum.spent:
+                            list_of_owes_users.append(match.splitted_user_id)
+                            final_sum.gains_me = list_of_owes_users
+                            final_sum.spent = match.owe - final_sum.spent
+                        elif match.owe < final_sum.spent:
+                            list_of_owes_users.append(match.splitted_user_id)
+                            final_sum.gains_me = list_of_owes_users
+                            final_sum.spent = final_sum.spent - match.owe
+
+

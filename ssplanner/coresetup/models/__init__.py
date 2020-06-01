@@ -1,8 +1,8 @@
 from .models import Contact, Topic, SplitAmountLedger
 
 
-__all_ = [
-    Contact,
-    Topic,
-    SplitAmountLedger,
+__all__ = [
+    "Contact",
+    "Topic",
+    "SplitAmountLedger",
 ]
