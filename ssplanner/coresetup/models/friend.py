@@ -3,7 +3,7 @@ from .auditlog import AuditLog
 from .contact import Contact
 
 
-class Friend(AuditLog):
+class Friend:
     """[summary]
 
     Args:

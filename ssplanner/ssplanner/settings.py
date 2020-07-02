@@ -96,8 +96,8 @@ DATABASES = {
 		'ENGINE':'django.db.backends.postgresql_psycopg2',
 		'HOST': 'localhost',
 		'NAME':'pocdb',
-		'USER':'splitz',
-		'PASSWORD':'splitz'
+		'USER':'postgres',
+		'PASSWORD':'postgres'
 		# 'PORT':5432,
 		# 'OPTIONS':{
 		# 	'autocommit':True,
