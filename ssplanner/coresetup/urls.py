@@ -14,7 +14,8 @@ from coresetup.views.subtopic import(
 )
 from coresetup.views.splitz import (
    SplitzView,
-   SplitzDetailView
+   SplitzDetailView,
+   SplitzSubTopic
 )
 from coresetup.views.friends import (
    FriendView,
@@ -42,6 +43,7 @@ urlpatterns = [
    url('topic',      TopicView.as_view(), name='topics'),
    path('splitz',     SplitzView.as_view(), name='splitz'),
    path('splitz/<int:pk>', SplitzDetailView.as_view(), name='splitzdetail'),
+   path('splitsub', SplitzSubTopic.as_view(), name='splitsub'),
    path('listfriends/<int:pk>', FriendDetailView.as_view(), name='listfriends'),   
    url('listfriend', FriendView.as_view(), name='listfriend'),
    url('createorder', OrderInterfaceView.as_view(), name='listfriend'),

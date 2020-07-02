@@ -143,6 +143,7 @@ class SplitzSubTopic(APIView):
     def post(self, request):
         # Get the sub_topic_id and calulated the splitted amount across the users
         sub_topic_id = request.data['sub_topic_id']
+        print(sub_topic_id)
         pre_splitz_amount = SplitAmountLedger.objects.filter(
                 sub_topic_id=sub_topic_id
             ).all()
@@ -180,5 +181,20 @@ class SplitzSubTopic(APIView):
                             list_of_owes_users.append(match.splitted_user_id)
                             final_sum.gains_me = list_of_owes_users
                             final_sum.spent = final_sum.spent - match.owe
+            response = []
+            for amount in pre_splitz_amount:
+                splitz = SplitLedgerSerializer(data=amount) 
+                if splitz.is_valid():
+                    splitz.save()
+                    response.append(splitz.data)
+                else:
+                    return Response(splitz.errors, status=status.HTTP_200_OK)
+            if response:
+                return Response(response, status=status.HTTP_200_OK)
+            else:
+                return Response([], status=status.HTTP_412_PRECONDITION_FAILED)
+
+
+
 
 

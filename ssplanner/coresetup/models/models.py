@@ -9,6 +9,7 @@ from django.db import models
 from datetime import datetime, timedelta
 from django.conf import settings
 from django.utils.timezone import now
+from django.contrib.postgres.fields import ArrayField
 # accounts.models.py
 from django.contrib.auth.models import (
     BaseUserManager, AbstractBaseUser
@@ -303,6 +304,9 @@ class SplitAmountLedger(models.Model):
             on_delete=models.CASCADE,
             blank=True
     )
+    owe = models.IntegerField(default=0, blank=True)
+    spent = models.IntegerField(default=0, blank=True)
+    gains_me = ArrayField(models.IntegerField(default=0), blank=True, default=[])
     created_by = models.ForeignKey(
                             settings.AUTH_USER_MODEL,
                             related_name='sa_ledger_created', 
