@@ -8,8 +8,8 @@ from rest_framework import status
 from rest_framework.permissions import (    
     AllowAny
 )
-from coresetup.models.models import SplitOrder
-from coresetup.serializers.serialiser import SplitOrderSerializer
+from coresetup.models.split_order import SplitOrder
+from coresetup.serializers.split_order import SplitOrderSerializer
 import razorpay
 from datetime import datetime
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from coresetup.models.models import SplitAmountLedger
+from coresetup.models.split_ledger import SplitAmountLedger
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -10,12 +10,11 @@ from rest_framework.permissions import (
     IsAuthenticated,
     AllowAny
 )
-from coresetup.models.models import (
-    Topic,
-    SubTopic,
-    Contact
-)
-from coresetup.serializers.serialiser import (
+# from coresetup.models.topic import Topic
+from coresetup.models.sub_topic import SubTopic
+from coresetup.models.contact import Contact
+
+from coresetup.serializers.split_ledger import (
     SplitLedgerSerializer,
     SplitLedgerDetailSerializer
 )

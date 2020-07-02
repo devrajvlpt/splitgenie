@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from coresetup.models.models import (
-    SplitAmountLedger,
-    Topic,
-    Contact
-)
-from coresetup.serializers.serialiser import (
+
+# from coresetup.models.topic import Topic
+# from coresetup.models.contact import Contact
+# from coresetup.models.split_ledger import SplitAmountLedger
+
+from coresetup.serializers.split_ledger import (
     SplitLedgerSerializer
 )
 

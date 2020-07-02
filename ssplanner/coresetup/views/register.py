@@ -2,7 +2,7 @@
 # https://github.com/RealmTeam/django-rest-framework-social-oauth2
 from __future__ import unicode_literals
 
-from coresetup.models.models import Contact
+from coresetup.models.contact import Contact
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -10,7 +10,7 @@ from rest_framework.permissions import (
     AllowAny,
     IsAuthenticated
 )
-from coresetup.serializers.serialiser import (
+from coresetup.serializers.contact import (
     ContactSerializer,
     UserSerializer
     )

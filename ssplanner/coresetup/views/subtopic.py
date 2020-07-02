@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
-from coresetup.models.models import (
-    Topic,    
+from coresetup.models.topic import (
+    Topic
 )
 from django.shortcuts import get_object_or_404
 from rest_framework.views import (
@@ -17,15 +17,13 @@ from rest_framework.permissions import (
     AllowAny,
     IsAuthenticated
 )
-from coresetup.serializers.serialiser import (
+from coresetup.serializers.sub_topic import (
     SubTopicSerializer,
     SubTopicDetailSerializer
     
 )
-from coresetup.models.models import (
-    SubTopic,
-    SplitAmountLedger
-)
+from coresetup.models.sub_topic import SubTopic
+from coresetup.models.split_ledger import SplitAmountLedger
 
 
 class SubSectionView(APIView):

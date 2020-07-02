@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from coresetup.models.models import (
+from coresetup.models.topic import (
     Topic,    
 )
 from django.shortcuts import get_object_or_404
@@ -18,9 +18,12 @@ from rest_framework.permissions import (
     AllowAny,
     IsAuthenticated
 )
-from coresetup.serializers.serialiser import (
+from coresetup.serializers.topic import (
     TopicSerializer,    
     TopicDetailSerializer,
+    
+)
+from coresetup.serializers.split_ledger import (
     SplitLedgerDetailSerializer,
     SplitLedgerSerializer
 )
